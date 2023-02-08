@@ -24,7 +24,7 @@ class Forecast extends React.Component {
 
       let data = await axios(config);
       data = data.data;
-      data.sort((a,b) => (a.dateTime > b.dateTime) ? 1 : -1);
+      data.sort((a,b) => (a.dateTimeEpoch > b.dateTimeEpoch) ? 1 : -1);
 
       this.setState({
         resortForecast: data,
