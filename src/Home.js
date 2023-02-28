@@ -7,9 +7,9 @@ class Home extends React.Component {
     return (
       <>
         <h1>home page</h1>
-        {this.props.resorts.map((resort) => {
+        {this.props.resorts.map((resort, index) => {
           return (
-            <h2>{resort.name}</h2>
+            <h2 key={index}>{resort.name}</h2>
           )
         })}
       </>

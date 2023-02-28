@@ -26,7 +26,21 @@ class Hourly extends React.Component {
       let data = await axios(config);
       data = data.data;
 
-      data.sort((a,b) => a.key > b.key ? 1 : -1);
+      data.sort((a, b) => a.key > b.key ? 1 : -1);
+
+      let currentDate;
+
+      data.forEach((forecast) => {
+        currentDate = new Date(forecast.datetimeEpoch);
+        forecast = {
+          dayOfWeek: currentDate.getDay() + 1,
+          date: currentDate.getDate(),
+          month: currentDate.getMonth() + 1,
+          year: currentDate.getFullYear(),
+          hour: currentDate.getUTCHours() - 8,
+          min: currentDate.getMinutes(),
+        }
+      });
 
       this.setState({
         resortForecast: data,
