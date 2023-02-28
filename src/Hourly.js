@@ -2,41 +2,18 @@ import React from 'react';
 import axios from 'axios';
 import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
-import './Forecast.css';
+import './Hourly.css';
 
-class Forecast extends React.Component {
+class Hourly extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      resorts: [],
       resortForecast: [],
     }
   }
 
   componentDidMount() {
-    this.getResorts();
-  }
-
-  getResorts = async () => {
-    try {
-      let config = {
-        method: 'GET',
-        url: `${process.env.REACT_APP_SERVER}/resorts`,
-      }
-
-      let data = await axios(config);
-      data = data.data;
-
-      data.sort((a,b) => a.name > b.name ? 1 : -1);
-
-      this.setState({
-        resorts: data,
-      })
-
-
-    } catch (error) {
-      console.log(error.message);
-    }
+    console.log(this.props.resorts);
   }
 
   getForecast = async (resort) => {
@@ -48,6 +25,8 @@ class Forecast extends React.Component {
 
       let data = await axios(config);
       data = data.data;
+
+      data.sort((a,b) => a.key > b.key ? 1 : -1);
 
       this.setState({
         resortForecast: data,
@@ -74,7 +53,7 @@ class Forecast extends React.Component {
             onChange={this.handleResortSelect}
           >
             <option>Select a Resort</option>
-            {this.state.resorts.map((resort, index) => {
+            {this.props.resorts.map((resort, index) => {
               return <option value={resort.name} key={index}>{resort.name}</option>
             })}
           </Form.Control>
@@ -87,6 +66,7 @@ class Forecast extends React.Component {
                 <th>Snow</th>
                 <th>Precip Type</th>
                 <th>Temp</th>
+                <th>Date Time Epoch</th>
               </tr>
             </thead>
             <tbody>
@@ -98,6 +78,7 @@ class Forecast extends React.Component {
                     <td>{forecast.snow}"</td>
                     <td>{forecast.precipType}</td>
                     <td>{forecast.temp} °F</td>
+                    <td>{forecast.dateTimeEpoch}</td>
                   </tr>
                 )
               })}
@@ -109,4 +90,4 @@ class Forecast extends React.Component {
   }
 }
 
-export default Forecast;
+export default Hourly;

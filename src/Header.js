@@ -10,7 +10,8 @@ class Header extends React.Component {
         <header>
           <Navbar collapseOnSelect expand="lg" bg="dark">
             <NavItem><Link to="/" className="nav-link">Home</Link></NavItem>
-            <NavItem><Link to="/Forecast" className="nav-link">Forecast</Link></NavItem>
+            <NavItem><Link to="/Hourly" className="nav-link">Hourly</Link></NavItem>
+            <NavItem><Link to="/Daily" className="nav-link">Daily</Link></NavItem>
             <NavItem><Link to="/Resorts" className="nav-link">Resorts</Link></NavItem>
           </Navbar>
         </header>
