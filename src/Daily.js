@@ -28,6 +28,19 @@ class Daily extends React.Component {
 
       data.sort((a, b) => a.key > b.key ? 1 : -1);
 
+      let currentDate;
+
+      data = data.map((forecast) => {
+        currentDate = new Date(forecast.dateTimeEpoch);
+        forecast.dayOfWeek = currentDate.getDay() + 1;
+        forecast.date = currentDate.getDate();
+        forecast.month = currentDate.getMonth() + 1;
+        forecast.year = currentDate.getFullYear();
+        forecast.hour = currentDate.getUTCHours() - 8;
+        forecast.min = currentDate.getMinutes();
+        return forecast;
+      });
+
       this.setState({
         resortForecast: data,
       })
@@ -69,6 +82,7 @@ class Daily extends React.Component {
                 <th>Wind Speed</th>
                 <th>Visibility</th>
                 <th>Icon</th>
+                <th>Date Time Epoch</th>
               </tr>
             </thead>
             <tbody>
@@ -83,6 +97,7 @@ class Daily extends React.Component {
                     <td>{forecast.windspeed.toFixed(1)} mph</td>
                     <td>{forecast.visibility.toFixed(1)} miles</td>
                     <td>{forecast.icon}</td>
+                    <td>{forecast.dateTimeEpoch}</td>
                   </tr>
                 )
               })}
