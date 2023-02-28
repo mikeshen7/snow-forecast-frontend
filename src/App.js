@@ -7,10 +7,44 @@ import {
 } from 'react-router-dom';
 import Home from './Home.js';
 import Header from './Header.js';
-import Forecast from './Forecast.js';
+import Hourly from './Hourly.js';
+import Daily from './Daily.js';
 import Resorts from './Resorts.js';
+import axios from 'axios';
 
 class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      resorts: [],
+    }
+  }
+
+  async componentDidMount() {
+    await this.getResorts();
+    console.log(this.state.resorts);
+  }
+
+  getResorts = async () => {
+    try {
+      let config = {
+        method: 'GET',
+        url: `${process.env.REACT_APP_SERVER}/resorts`,
+      }
+
+      let data = await axios(config);
+      data = data.data;
+
+      data.sort((a, b) => a.name > b.name ? 1 : -1);
+
+      this.setState({
+        resorts: data,
+      })
+
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
 
   render() {
     return (
@@ -21,13 +55,19 @@ class App extends React.Component {
 
             <Route
               exact path="/"
-              element={<Home />}
+              element={<Home resorts={this.state.resorts}/>}
             >
             </Route>
 
             <Route
-              exact path="/Forecast"
-              element={<Forecast />}
+              exact path="/Hourly"
+              element={<Hourly resorts={this.state.resorts}/>}
+            >
+            </Route>
+
+            <Route
+              exact path="/Daily"
+              element={<Daily resorts={this.state.resorts}/>}
             >
             </Route>
 
