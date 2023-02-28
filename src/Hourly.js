@@ -13,14 +13,13 @@ class Hourly extends React.Component {
   }
 
   componentDidMount() {
-    console.log(this.props.resorts);
   }
 
   getForecast = async (resort) => {
     try {
       let config = {
         method: 'GET',
-        url: `${process.env.REACT_APP_SERVER}/weather/${resort}`,
+        url: `${process.env.REACT_APP_SERVER}/hourlyWeather/${resort}`,
       }
 
       let data = await axios(config);
@@ -30,16 +29,15 @@ class Hourly extends React.Component {
 
       let currentDate;
 
-      data.forEach((forecast) => {
-        currentDate = new Date(forecast.datetimeEpoch);
-        forecast = {
-          dayOfWeek: currentDate.getDay() + 1,
-          date: currentDate.getDate(),
-          month: currentDate.getMonth() + 1,
-          year: currentDate.getFullYear(),
-          hour: currentDate.getUTCHours() - 8,
-          min: currentDate.getMinutes(),
-        }
+      data = data.map((forecast) => {
+        currentDate = new Date(forecast.dateTimeEpoch);
+        forecast.dayOfWeek = currentDate.getDay() + 1;
+        forecast.date = currentDate.getDate();
+        forecast.month = currentDate.getMonth() + 1;
+        forecast.year = currentDate.getFullYear();
+        forecast.hour = currentDate.getUTCHours() - 8;
+        forecast.min = currentDate.getMinutes();
+        return forecast;
       });
 
       this.setState({
@@ -48,7 +46,7 @@ class Hourly extends React.Component {
 
 
     } catch (error) {
-      console.log(error.message);
+      console.log(error.message, 'Hourly.js getForecast');
     }
   }
 

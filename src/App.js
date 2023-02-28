@@ -22,7 +22,6 @@ class App extends React.Component {
 
   async componentDidMount() {
     await this.getResorts();
-    console.log(this.state.resorts);
   }
 
   getResorts = async () => {
@@ -42,7 +41,7 @@ class App extends React.Component {
       })
 
     } catch (error) {
-      console.log(error.message);
+      console.log(error.message, 'App.js getResorts');
     }
   }
 
