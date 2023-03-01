@@ -2,6 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
+import Icon from '../src/Icon';
 import './Hourly.css';
 
 class Hourly extends React.Component {
@@ -13,6 +14,7 @@ class Hourly extends React.Component {
   }
 
   componentDidMount() {
+    this.props.getResorts();
   }
 
   getForecast = async (resort) => {
@@ -70,32 +72,41 @@ class Hourly extends React.Component {
             })}
           </Form.Control>
 
-          <Table bordered>
-            <thead>
-              <tr>
-                <th>Resort Name</th>
-                <th>Date</th>
-                <th>Snow</th>
-                <th>Precip Type</th>
-                <th>Temp</th>
-                <th>Date Time Epoch</th>
-              </tr>
-            </thead>
-            <tbody>
-              {this.state.resortForecast.map((forecast, index) => {
-                return (
-                  <tr key={index}>
-                    <td>{forecast.resort}</td>
-                    <td>{forecast.month}/{forecast.date}/{forecast.year} {forecast.dateTime}</td>
-                    <td>{forecast.snow}"</td>
-                    <td>{forecast.precipType}</td>
-                    <td>{forecast.temp} °F</td>
-                    <td>{forecast.dateTimeEpoch}</td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </Table>
+          <div className='dailyForecastTable'>
+            <Table bordered>
+              <thead>
+                <tr>
+                  <th>Resort Name</th>
+                  <th>Date</th>
+                  <th>Icon</th>
+                  <th>Snow</th>
+                  <th>Precip Type</th>
+                  <th>Temp</th>
+                  <th>Date Time Epoch</th>
+                </tr>
+              </thead>
+              <tbody>
+                {this.state.resortForecast.map((forecast, index) => {
+                  return (
+                    <tr key={index}>
+                      <td>{forecast.resort}</td>
+                      <td>{forecast.month}/{forecast.date}/{forecast.year} {forecast.dateTime}</td>
+                      <td>
+                        <div>
+                          <p>{forecast.icon} </p>
+                          <img src={Icon(forecast.icon)} alt='forecast icon'></img>
+                        </div>
+                      </td>
+                      <td>{forecast.snow}"</td>
+                      <td>{forecast.precipType}</td>
+                      <td>{forecast.temp} °F</td>
+                      <td>{forecast.dateTimeEpoch}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </Table>
+          </div>
         </div >
       </>
     );
