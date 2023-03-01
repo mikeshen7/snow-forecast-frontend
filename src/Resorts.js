@@ -2,7 +2,6 @@ import React from 'react';
 import axios from 'axios';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import Table from 'react-bootstrap/Table';
 import './Resorts.css';
 import { Next } from 'react-bootstrap/esm/PageItem';
 
@@ -10,16 +9,16 @@ class Resorts extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      resorts: [],
       validated: false,
       formName: '',
       formLat: '',
       formLon: '',
+      formUtc: '',
     }
   }
 
   componentDidMount() {
-    this.getResorts();
+    this.props.getResorts();
   }
 
   handleNameInput = (event) => {
@@ -40,6 +39,13 @@ class Resorts extends React.Component {
     event.preventDefault();
     this.setState({
       formLon: +event.target.value,
+    })
+  }
+
+  handleUtcInput = (event) => {
+    event.preventDefault();
+    this.setState({
+      formUtc: +event.target.value,
     })
   }
 
@@ -71,7 +77,16 @@ class Resorts extends React.Component {
       name: this.state.formName,
       lat: this.state.formLat,
       lon: this.state.formLon,
+      utc: this.state.formUtc,
     }
+
+    this.setState({
+      validated: false,
+      formName: '',
+      formLat: '',
+      formLon: '',
+      formUtc: '',
+    })
 
     try {
       let config = {
@@ -82,7 +97,7 @@ class Resorts extends React.Component {
 
       await axios(config);
 
-      this.getResorts();
+      this.props.getResorts();
 
     } catch (error) {
       console.log(error.message);
@@ -131,26 +146,7 @@ class Resorts extends React.Component {
 
       await axios(config);
 
-      this.getResorts();
-
-    } catch (error) {
-      console.log(error.message);
-    }
-  }
-
-  getResorts = async () => {
-    try {
-      let config = {
-        method: 'GET',
-        url: `${process.env.REACT_APP_SERVER}/resorts`,
-      }
-
-      let resortsArray = await axios(config);
-      resortsArray = resortsArray.data;
-
-      this.setState({
-        resorts: resortsArray,
-      })
+      this.props.getResorts();
 
     } catch (error) {
       console.log(error.message);
@@ -166,7 +162,7 @@ class Resorts extends React.Component {
 
       await axios(config);
 
-      this.getResorts();
+      this.props.getResorts();
 
     } catch (error) {
       console.log(error.message);
@@ -183,45 +179,56 @@ class Resorts extends React.Component {
             noValidate validated={this.state.validated}
             className='resort-form'>
             <Form.Label>Ski Resort Form</Form.Label>
-            <Form.Group controlId="name">
-              <Form.Control type='text' placeholder="Resort Name" required onChange={this.handleNameInput}></Form.Control>
+            <Form.Group controlId="name" className='form-input'>
+              <Form.Label>Resort Name</Form.Label>
+              <Form.Control type='text' value={this.state.formName} placeholder='Resort Name' required onChange={this.handleNameInput}></Form.Control>
               <Form.Control.Feedback type="invalid">Please enter in the Resort Name</Form.Control.Feedback>
             </Form.Group>
 
-            <Form.Group controlId="lat">
-              <Form.Control type='number' placeholder="Latitude" required onChange={this.handleLatInput}></Form.Control>
+            <Form.Group controlId="lat" className='form-input'>
+              <Form.Label>Latitude</Form.Label>
+              <Form.Control type='number' value={this.state.formLat} placeholder='47' required onChange={this.handleLatInput}></Form.Control>
               <Form.Control.Feedback type="invalid">Please enter in the latitude</Form.Control.Feedback>
             </Form.Group>
 
-            <Form.Group controlId="lon">
-              <Form.Control type='number' placeholder="Longitude" required onChange={this.handleLonInput}></Form.Control>
+            <Form.Group controlId="lon" className='form-input'>
+              <Form.Label>Longitude</Form.Label>
+              <Form.Control type='number' value={this.state.formLon} placeholder='-122' required onChange={this.handleLonInput}></Form.Control>
               <Form.Control.Feedback type="invalid">Please enter in the longitude</Form.Control.Feedback>
             </Form.Group>
+
+            <Form.Group controlId="UTC" className='form-input'>
+              <Form.Label>UTC Offset</Form.Label>
+              <Form.Control type='number' value={this.state.formUtc} placeholder='-8' required onChange={this.handleUtcInput}></Form.Control>
+              <Form.Control.Feedback type="invalid">Please enter in the UTC</Form.Control.Feedback>
+            </Form.Group>
+
+
             <Button type='submit' id="submit-button" onClick={this.handleAddResort}>Add</Button>
           </Form>
 
-          <Table bordered>
-            <thead>
-              <tr>
-                <th>Resort Name</th>
-                <th>Latitude</th>
-                <th>Longitude</th>
-                <th>Delete</th>
-              </tr>
-            </thead>
-            <tbody>
-              {this.state.resorts.map((resort, index) => {
+          <div className='resorts-table'>
+            <tr className='resorts-row'>
+              <th className='resorts-cell'>Resort Name</th>
+              <th className='resorts-cell'>Latitude</th>
+              <th className='resorts-cell'>Longitude</th>
+              <th className='resorts-cell'>UTC</th>
+              <th className='resorts-cell'>Delete</th>
+            </tr>
+            <div className='table-scrollable'>
+              {this.props.resorts.map((resort, index) => {
                 return (
-                  <tr key={index}>
-                    <td>{resort.name}</td>
-                    <td>{resort.lat}</td>
-                    <td>{resort.lon}</td>
-                    <td><Button type='submit' onClick={() => this.deleteResort(resort.name)}>Delete</Button></td>
+                  <tr className='resorts-row' key={index}>
+                    <td className='resorts-cell'>{resort.name}</td>
+                    <td className='resorts-cell'>{resort.lat}</td>
+                    <td className='resorts-cell'>{resort.lon}</td>
+                    <td className='resorts-cell'>{resort.utc}</td>
+                    <td className='resorts-cell'><Button type='submit' onClick={() => this.deleteResort(resort.name)}>Delete</Button></td>
                   </tr>
                 )
               })}
-            </tbody>
-          </Table>
+            </div>
+          </div>
         </div >
       </>
     );

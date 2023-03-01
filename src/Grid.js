@@ -1,11 +1,12 @@
 import React from 'react';
 import axios from 'axios';
-import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
-import Icon from '../src/Icon';
-import './Hourly.css';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import './Grid.css';
 
-class Daily extends React.Component {
+class Grid extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -56,7 +57,6 @@ class Daily extends React.Component {
     this.getForecast(event.target.value);
   }
 
-
   render() {
     return (
       <>
@@ -71,47 +71,27 @@ class Daily extends React.Component {
             })}
           </Form.Control>
 
-          <div className='dailyForecastTable'>
-            <Table bordered >
-              <thead>
-                <tr>
-                  <th>Resort Name</th>
-                  <th>Date</th>
-                  <th>Icon</th>
-                  <th>Temp</th>
-                  <th>Snow</th>
-                  <th>Precip Type</th>
-                  <th>Wind Speed</th>
-                  <th>Visibility</th>
-                </tr>
-              </thead>
-              <tbody>
-                {this.state.resortForecast.map((forecast, index) => {
-                  return (
-                    <tr key={index}>
-                      <td>{forecast.resort}</td>
-                      <td>{forecast.month}/{forecast.date}/{forecast.year} {forecast.dateTime} {forecast.time}</td>
-                      <td>
-                        <div>
-                          <p>{forecast.icon} </p>
-                          <img src={Icon(forecast.icon)} alt='forecast icon'></img>
-                        </div>
-                      </td>
-                      <td>{forecast.temp.toFixed(1)} °F</td>
-                      <td>{forecast.snow.toFixed(1)}"</td>
-                      <td>{forecast.precipType}</td>
-                      <td>{forecast.windspeed.toFixed(1)} mph</td>
-                      <td>{forecast.visibility.toFixed(1)} miles</td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </Table>
-          </div>
+          <Container>
+            {this.state.resortForecast.length === 0
+              ? null
+              : <Row>
+                <Col>{this.state.resortForecast[0].month}/{this.state.resortForecast[0].date}/{this.state.resortForecast[0].year}</Col>
+                <Col>{this.state.resortForecast[2].month}/{this.state.resortForecast[2].date}/{this.state.resortForecast[2].year}</Col>
+                <Col>{this.state.resortForecast[5].month}/{this.state.resortForecast[5].date}/{this.state.resortForecast[5].year}</Col>
+                <Col>{this.state.resortForecast[8].month}/{this.state.resortForecast[8].date}/{this.state.resortForecast[8].year}</Col>
+                <Col>{this.state.resortForecast[11].month}/{this.state.resortForecast[11].date}/{this.state.resortForecast[11].year}</Col>
+                <Col>{this.state.resortForecast[14].month}/{this.state.resortForecast[14].date}/{this.state.resortForecast[14].year}</Col>
+                <Col>{this.state.resortForecast[17].month}/{this.state.resortForecast[17].date}/{this.state.resortForecast[17].year}</Col>
+              </Row>
+            }
+
+
+          </Container>
+
         </div >
       </>
     );
   }
 }
 
-export default Daily;
+export default Grid;

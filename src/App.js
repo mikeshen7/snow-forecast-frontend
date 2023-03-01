@@ -9,6 +9,7 @@ import Home from './Home.js';
 import Header from './Header.js';
 import Hourly from './Hourly.js';
 import Daily from './Daily.js';
+import Grid from './Grid.js';
 import Resorts from './Resorts.js';
 import axios from 'axios';
 
@@ -21,7 +22,7 @@ class App extends React.Component {
   }
 
   async componentDidMount() {
-    await this.getResorts();
+    this.getResorts();
   }
 
   getResorts = async () => {
@@ -54,25 +55,46 @@ class App extends React.Component {
 
             <Route
               exact path="/"
-              element={<Home resorts={this.state.resorts}/>}
+              element={<Home
+                resorts={this.state.resorts}
+                getResorts={this.getResorts}
+              />}
             >
             </Route>
 
             <Route
               exact path="/Hourly"
-              element={<Hourly resorts={this.state.resorts}/>}
+              element={<Hourly
+                resorts={this.state.resorts}
+                getResorts={this.getResorts}
+              />}
             >
             </Route>
 
             <Route
               exact path="/Daily"
-              element={<Daily resorts={this.state.resorts}/>}
+              element={<Daily
+                resorts={this.state.resorts}
+                getResorts={this.getResorts}
+              />}
+            >
+            </Route>
+
+            <Route
+              exact path="/Grid"
+              element={<Grid
+                resorts={this.state.resorts}
+                getResorts={this.getResorts}
+              />}
             >
             </Route>
 
             <Route
               exact path="/Resorts"
-              element={<Resorts />}
+              element={<Resorts
+                resorts={this.state.resorts}
+                getResorts={this.getResorts}
+              />}
             >
             </Route>
 
