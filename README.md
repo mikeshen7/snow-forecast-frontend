@@ -1,70 +1,54 @@
-# Getting Started with Create React App
+# Snowcast Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Responsive frontend for ski resort weather forecasts. Built with Create React App and designed to consume the `weather-backend` API.
 
-## Available Scripts
+## Requirements
 
-In the project directory, you can run:
+- Node.js 18+
+- Backend running (local or deployed)
 
-### `npm start`
+## Environment
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Create a `.env` using `.sample.env` as a template.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Required:
 
-### `npm test`
+- `REACT_APP_BACKEND_URL` - base URL for the backend (e.g. `http://localhost:3001` or `https://<backend>.onrender.com`)
+- `REACT_APP_BACKEND_API_KEY` - backend API key
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Local Development
 
-### `npm run build`
+```bash
+npm install
+npm start
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+The app runs at `http://localhost:3000`.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Build
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+npm run build
+```
 
-### `npm run eject`
+Output goes to `build/`.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Deploy on Render (Static Site)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Use Render Static Site:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- Build command: `npm run build`
+- Publish directory: `build`
+- Environment variables: `REACT_APP_BACKEND_URL`, `REACT_APP_BACKEND_API_KEY`
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Backend Configuration (CORS + Magic Link)
 
-## Learn More
+For magic-link auth to work in production:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- Backend CORS must allow the frontend origin.
+- `FRONTEND_MAGIC_LINK_BASE_URL` should point to the backend base URL (so the link hits `/auth/verify` on the backend).
+- `FRONTEND_REDIRECT_BASE_URL` should point to the frontend base URL (where the backend redirects after verification).
+- `FRONTEND_COOKIE_SECURE=true` for https deployments.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+If you see a CORS error like:
+`Access-Control-Allow-Origin missing`, update the backend allowlist to include your frontend URL and redeploy the backend.
