@@ -331,7 +331,14 @@ function App() {
           </button>
         </div>
       ) : (
-        <button type="button" onClick={() => setShowLogin(true)} className="login-trigger">
+        <button
+          type="button"
+          onClick={() => {
+            setMobileMenuOpen(false);
+            setShowLogin(true);
+          }}
+          className="login-trigger"
+        >
           Login
         </button>
       )}
