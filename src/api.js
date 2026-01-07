@@ -1,5 +1,35 @@
 const API_BASE_URL = (process.env.REACT_APP_BACKEND_URL || process.env.REACT_APP_SERVER || '').replace(/\/$/, '');
 const API_KEY = process.env.REACT_APP_BACKEND_API_KEY || '';
+const ACCESS_TOKEN_KEY = 'snowcast.accessToken';
+const REFRESH_TOKEN_KEY = 'snowcast.refreshToken';
+const ACCESS_TOKEN_EXPIRES_KEY = 'snowcast.accessTokenExpiresAt';
+
+function getAccessToken() {
+  return sessionStorage.getItem(ACCESS_TOKEN_KEY) || '';
+}
+
+function getRefreshToken() {
+  return sessionStorage.getItem(REFRESH_TOKEN_KEY) || '';
+}
+
+function setTokens({ accessToken, refreshToken, expiresInMinutes }) {
+  if (accessToken) {
+    sessionStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+  }
+  if (refreshToken) {
+    sessionStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+  }
+  if (expiresInMinutes) {
+    const expiresAt = Date.now() + Number(expiresInMinutes) * 60 * 1000;
+    sessionStorage.setItem(ACCESS_TOKEN_EXPIRES_KEY, String(expiresAt));
+  }
+}
+
+export function clearTokens() {
+  sessionStorage.removeItem(ACCESS_TOKEN_KEY);
+  sessionStorage.removeItem(REFRESH_TOKEN_KEY);
+  sessionStorage.removeItem(ACCESS_TOKEN_EXPIRES_KEY);
+}
 
 function buildUrl(path, params) {
   const url = `${API_BASE_URL}${path}`;
@@ -13,17 +43,22 @@ function buildUrl(path, params) {
   return query ? `${url}?${query}` : url;
 }
 
-async function apiFetch(path, { method = 'GET', params, body } = {}) {
+async function apiFetch(path, { method = 'GET', params, body, auth = true, retryOnUnauthorized = true } = {}) {
   const url = buildUrl(path, params);
   const headers = { 'Content-Type': 'application/json' };
   if (API_KEY) {
     headers['x-api-key'] = API_KEY;
   }
+  if (auth) {
+    const accessToken = getAccessToken();
+    if (accessToken) {
+      headers.Authorization = `Bearer ${accessToken}`;
+    }
+  }
 
   const response = await fetch(url, {
     method,
     headers,
-    credentials: 'include',
     body: body ? JSON.stringify(body) : undefined,
   });
 
@@ -32,6 +67,12 @@ async function apiFetch(path, { method = 'GET', params, body } = {}) {
   const payload = isJson ? await response.json() : await response.text();
 
   if (!response.ok) {
+    if (response.status === 401 && retryOnUnauthorized) {
+      const refreshed = await refreshAccessToken();
+      if (refreshed) {
+        return apiFetch(path, { method, params, body, auth, retryOnUnauthorized: false });
+      }
+    }
     const message = typeof payload === 'string' ? payload : payload?.error || 'Request failed';
     throw new Error(message);
   }
@@ -39,19 +80,58 @@ async function apiFetch(path, { method = 'GET', params, body } = {}) {
   return payload;
 }
 
-export function requestMagicLink(email, redirectPath = '/') {
+export function requestMagicLink(email, redirectPath = '/', mode = 'token') {
   return apiFetch('/auth/request-link', {
     method: 'POST',
-    body: { email, redirectPath },
+    body: { email, redirectPath, mode },
+    auth: false,
+    retryOnUnauthorized: false,
   });
 }
 
+export function verifyMagicToken(token) {
+  return apiFetch('/auth/verify', {
+    method: 'POST',
+    body: { token },
+    auth: false,
+    retryOnUnauthorized: false,
+  }).then((payload) => {
+    setTokens(payload || {});
+    return payload;
+  });
+}
+
+export async function refreshAccessToken() {
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) return null;
+  try {
+    const payload = await apiFetch('/auth/refresh', {
+      method: 'POST',
+      body: { refreshToken },
+      auth: false,
+      retryOnUnauthorized: false,
+    });
+    setTokens(payload || {});
+    return payload?.accessToken || null;
+  } catch (error) {
+    clearTokens();
+    return null;
+  }
+}
+
 export function getSession() {
-  return apiFetch('/auth/session');
+  return apiFetch('/auth/session', { auth: true });
 }
 
 export function logout() {
-  return apiFetch('/auth/logout', { method: 'POST' });
+  const refreshToken = getRefreshToken();
+  clearTokens();
+  return apiFetch('/auth/logout', {
+    method: 'POST',
+    body: { refreshToken },
+    auth: false,
+    retryOnUnauthorized: false,
+  });
 }
 
 export function getLocations({ query = '', isSkiResort = true, limit = 50 } = {}) {

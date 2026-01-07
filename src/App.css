@@ -200,6 +200,15 @@ select option {
   color: rgba(248, 251, 255, 0.7);
 }
 
+.modal-message {
+  background: rgba(47, 95, 168, 0.08);
+  border: 1px solid rgba(47, 95, 168, 0.2);
+  color: var(--ink-700);
+  font-size: 13px;
+  padding: 10px 12px;
+  border-radius: 12px;
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;

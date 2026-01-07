@@ -9,6 +9,8 @@ import {
   getDailyOverview,
   getDailySegments,
   getHourly,
+  verifyMagicToken,
+  refreshAccessToken,
 } from './api';
 import {
   buildCalendarRange,
@@ -164,8 +166,19 @@ function App() {
 
   useEffect(() => {
     let isMounted = true;
-    getSession()
-      .then((data) => {
+    const initAuth = async () => {
+      setAuthStatus('loading');
+      try {
+        const url = new URL(window.location.href);
+        const magicToken = url.searchParams.get('token');
+        if (magicToken) {
+          await verifyMagicToken(magicToken);
+          url.searchParams.delete('token');
+          window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+        } else {
+          await refreshAccessToken();
+        }
+        const data = await getSession();
         if (!isMounted) return;
         if (data?.authenticated) {
           setUser(data.user);
@@ -174,12 +187,14 @@ function App() {
           setUser(null);
           setAuthStatus('anonymous');
         }
-      })
-      .catch(() => {
+      } catch (error) {
         if (!isMounted) return;
         setUser(null);
         setAuthStatus('anonymous');
-      });
+      }
+    };
+
+    initAuth();
 
     return () => {
       isMounted = false;
@@ -303,10 +318,10 @@ function App() {
     event.preventDefault();
     setAuthMessage('');
     try {
-      await requestMagicLink(email);
+      const redirectPath = `${window.location.pathname}${window.location.search}`;
+      await requestMagicLink(email, redirectPath, 'token');
       setAuthMessage('Check your email for a sign-in link.');
       setEmail('');
-      setShowLogin(false);
     } catch (error) {
       setAuthMessage(error.message || 'Unable to send login link.');
     }
@@ -334,6 +349,7 @@ function App() {
         <button
           type="button"
           onClick={() => {
+            setAuthMessage('');
             setMobileMenuOpen(false);
             setShowLogin(true);
           }}
@@ -342,7 +358,6 @@ function App() {
           Login
         </button>
       )}
-      {authMessage ? <div className="auth-message">{authMessage}</div> : null}
     </>
   );
 
@@ -881,6 +896,7 @@ function App() {
               />
               <button type="submit">Login</button>
             </form>
+            {authMessage ? <div className="modal-message">{authMessage}</div> : null}
           </div>
         </div>
       ) : null}
